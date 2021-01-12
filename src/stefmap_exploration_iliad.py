@@ -54,7 +54,7 @@ class stefmap_exploration_node(object):
 		self.markerPub = rospy.Publisher('location_markers', Marker,queue_size=10)	
 
 		# start a timer to check regularly if we can send a exploration goal
-		self.check_robot_availability_timer = rospy.Timer(rospy.Duration(5),self.check_robot_availability)
+		self.check_robot_availability_timer = rospy.Timer(rospy.Duration(10),self.check_robot_availability)
 
 		# show exploration location in rviz
 		self.display_location_markers()
@@ -223,63 +223,73 @@ class stefmap_exploration_node(object):
 		rospy.loginfo("Checking exploration availability:")
 
 		if (len(self.active_robots) > 0):
-			# check how many robots are free
+			already_exploring = 0
+			# check if nay robot is already exploring
 			for robot in self.active_robots:
-				if self.active_robots[robot]["status"] == "FREE":
-					robots_free = robots_free + 1
+				if self.active_robots[robot]["action"] == "EXPLORING":
+					already_exploring = 1
+					rospy.loginfo("Robot already exploring")
+					break
 
-			if robots_free > 0:
-				if (self.mission_status["seconds_left_next"] == "-" or self.mission_status["seconds_left_next"] > 300):
-					for robot in self.active_robots:
-						if self.active_robots[robot]["status"] == "FREE":
-							self.choose_location_to_explore()
-							self.display_location_markers()
-							self.display_chosen_location()
-							
-							rospy.loginfo("Requesting "+str(robot+" to explore location "+str(self.location_chosen)))
-							exploration_goal_msg = PoseStamped()
-							exploration_goal_msg.header.stamp = rospy.get_rostime()
-							exploration_goal_msg.header.frame_id = self.locations_frame_id
-							exploration_goal_msg.pose.position.x = self.locations_data["locations"][self.location_chosen]["x"]
-							exploration_goal_msg.pose.position.y =self.locations_data["locations"][self.location_chosen]["y"]
 
-							qx,qy,qz,qw = tf.transformations.quaternion_from_euler(0,0,self.locations_data["locations"][self.location_chosen]["yaw"])
-							exploration_goal_msg.pose.orientation.x = qx
-							exploration_goal_msg.pose.orientation.y = qy
-							exploration_goal_msg.pose.orientation.z = qz
-							exploration_goal_msg.pose.orientation.w = qw
+			if already_exploring == 0:
+				# check how many robots are free
+				for robot in self.active_robots:
+					if self.active_robots[robot]["status"] == "FREE":
+						robots_free = robots_free + 1
 
-							self.exploration_goal_publisher.publish(exploration_goal_msg)
-							break
+				if robots_free > 0:
+					if (self.mission_status["seconds_left_next"] == "-" or self.mission_status["seconds_left_next"] > 300):
+						for robot in self.active_robots:
+							if self.active_robots[robot]["status"] == "FREE":
+								self.choose_location_to_explore()
+								self.display_location_markers()
+								self.display_chosen_location()
+								
+								rospy.loginfo("Requesting "+str(robot+" to explore location "+str(self.location_chosen)))
+								exploration_goal_msg = PoseStamped()
+								exploration_goal_msg.header.stamp = rospy.get_rostime()
+								exploration_goal_msg.header.frame_id = self.locations_frame_id
+								exploration_goal_msg.pose.position.x = self.locations_data["locations"][self.location_chosen]["x"]
+								exploration_goal_msg.pose.position.y =self.locations_data["locations"][self.location_chosen]["y"]
 
-				elif (self.mission_status["seconds_left_next"] < 300 and robots_free > 1):
-					for robot in self.active_robots:
-						if self.active_robots[robot]["status"] == "FREE":
-							self.choose_location_to_explore()
-							self.display_location_markers()
-							self.display_chosen_location()
-							
-							rospy.loginfo("Requesting "+str(robot+" to explore location "+str(self.location_chosen)))
-							exploration_goal_msg = PoseStamped()
-							exploration_goal_msg.header.stamp = rospy.get_rostime()
-							exploration_goal_msg.header.frame_id = self.locations_frame_id
-							exploration_goal_msg.pose.position.x = self.locations_data["locations"][self.location_chosen]["x"]
-							exploration_goal_msg.pose.position.y =self.locations_data["locations"][self.location_chosen]["y"]
+								qx,qy,qz,qw = tf.transformations.quaternion_from_euler(0,0,self.locations_data["locations"][self.location_chosen]["yaw"])
+								exploration_goal_msg.pose.orientation.x = qx
+								exploration_goal_msg.pose.orientation.y = qy
+								exploration_goal_msg.pose.orientation.z = qz
+								exploration_goal_msg.pose.orientation.w = qw
 
-							qx,qy,qz,qw = tf.transformations.quaternion_from_euler(0,0,self.locations_data["locations"][self.location_chosen]["yaw"])
-							exploration_goal_msg.pose.orientation.x = qx
-							exploration_goal_msg.pose.orientation.y = qy
-							exploration_goal_msg.pose.orientation.z = qz
-							exploration_goal_msg.pose.orientation.w = qw
+								self.exploration_goal_publisher.publish(exploration_goal_msg)
+								break
 
-							self.exploration_goal_publisher.publish(exploration_goal_msg)
-							break
+					elif (self.mission_status["seconds_left_next"] < 300 and robots_free > 1):
+						for robot in self.active_robots:
+							if self.active_robots[robot]["status"] == "FREE":
+								self.choose_location_to_explore()
+								self.display_location_markers()
+								self.display_chosen_location()
+								
+								rospy.loginfo("Requesting "+str(robot+" to explore location "+str(self.location_chosen)))
+								exploration_goal_msg = PoseStamped()
+								exploration_goal_msg.header.stamp = rospy.get_rostime()
+								exploration_goal_msg.header.frame_id = self.locations_frame_id
+								exploration_goal_msg.pose.position.x = self.locations_data["locations"][self.location_chosen]["x"]
+								exploration_goal_msg.pose.position.y =self.locations_data["locations"][self.location_chosen]["y"]
+
+								qx,qy,qz,qw = tf.transformations.quaternion_from_euler(0,0,self.locations_data["locations"][self.location_chosen]["yaw"])
+								exploration_goal_msg.pose.orientation.x = qx
+								exploration_goal_msg.pose.orientation.y = qy
+								exploration_goal_msg.pose.orientation.z = qz
+								exploration_goal_msg.pose.orientation.w = qw
+
+								self.exploration_goal_publisher.publish(exploration_goal_msg)
+								break
+					else:
+						rospy.loginfo( "Only 1 free robot and the next mission is too close in time")
+
+
 				else:
-					rospy.loginfo( "Only 1 free robot and the next mission is too close in time")
-
-
-			else:
-				rospy.loginfo( "No free robots")
+					rospy.loginfo( "No free robots")
 
 		else:
 			rospy.loginfo( "No active robots")
