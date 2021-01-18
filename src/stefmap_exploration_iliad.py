@@ -221,7 +221,7 @@ class stefmap_exploration_node(object):
 	def check_robot_availability(self,timer):
 		robots_free = 0
 		rospy.loginfo("Checking exploration availability:")
-
+		self.display_location_markers()
 		if (len(self.active_robots) > 0):
 			already_exploring = 0
 			# check if nay robot is already exploring
@@ -243,7 +243,7 @@ class stefmap_exploration_node(object):
 						for robot in self.active_robots:
 							if self.active_robots[robot]["status"] == "FREE":
 								self.choose_location_to_explore()
-								self.display_location_markers()
+								#self.display_location_markers()
 								self.display_chosen_location()
 								
 								rospy.loginfo("Requesting "+str(robot+" to explore location "+str(self.location_chosen)))
@@ -266,7 +266,7 @@ class stefmap_exploration_node(object):
 						for robot in self.active_robots:
 							if self.active_robots[robot]["status"] == "FREE":
 								self.choose_location_to_explore()
-								self.display_location_markers()
+								#self.display_location_markers()
 								self.display_chosen_location()
 								
 								rospy.loginfo("Requesting "+str(robot+" to explore location "+str(self.location_chosen)))
@@ -331,6 +331,7 @@ class stefmap_exploration_node(object):
 		
 		else: # in case no entropy received all location have the same probability to be chosen
 			self.location_chosen = random.randint(0,len(self.locations_data["locations"])-1)
+			self.location_chosen = 6
 			print "location chosen: ",self.location_chosen
 
 		
