@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <node pkg="stefmap_exploration" type="stefmap_exploration_iliad.py" name="stefmap_exploration_iliad_node" output="screen">
-    	<param name="locations_file" value="$(find stefmap_exploration)/config/orkla_locations.json"/>  
+    <node pkg="stefmap_exploration" type="stefmap_exploration_iliad_v2.py" name="stefmap_exploration_iliad_node" output="screen">
+    	<param name="locations_file" value="$(find stefmap_exploration)/config/orkla_test_locations.json"/>  
 		<param name="update_locations_info" value="False" />
     	<param name="using_simulation" value="True" />
         <param name="locations_frame_id" value="map_laser2d" />

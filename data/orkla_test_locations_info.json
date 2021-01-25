@@ -1,0 +1,32 @@
+{
+    "locations": [
+        {
+            "y": 4.61, 
+            "x": 7.35, 
+            "yaw": 0, 
+            "num_visible_cells": 0, 
+            "visible_cells": []
+        }, 
+        {
+            "y": 6.81, 
+            "x": 19.73, 
+            "yaw": 0, 
+            "num_visible_cells": 0, 
+            "visible_cells": []
+        }, 
+        {
+            "y": 14.62, 
+            "x": 19.44, 
+            "yaw": 0, 
+            "num_visible_cells": 0, 
+            "visible_cells": []
+        }, 
+        {
+            "y": 15.3, 
+            "x": 3.96, 
+            "yaw": 0, 
+            "num_visible_cells": 0, 
+            "visible_cells": []
+        }
+    ]
+}
