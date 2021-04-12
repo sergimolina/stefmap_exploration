@@ -356,7 +356,7 @@ class stefmap_exploration_node(object):
 				already_exploring = 0
 				# check if any robot is already exploring
 				for robot in self.active_robots:
-					if self.active_robots[robot]["action"] == "EXPLORING":
+					if self.active_robots[robot]["operation"] == "EXPLORING":
 						already_exploring = 1
 						rospy.loginfo("Robot already exploring")
 						self.display_chosen_location()
@@ -471,8 +471,7 @@ class stefmap_exploration_node(object):
 		
 		else: # in case no entropy received all location have the same probability to be chosen
 			self.location_chosen = random.randint(0,len(self.locations_data["locations"])-1)
-			self.location_chosen = 6
-			prospy.loginfo("location chosen: "+str(self.location_chosen))
+			rospy.loginfo("location chosen: "+str(self.location_chosen))
 
 		
 	def run(self):
